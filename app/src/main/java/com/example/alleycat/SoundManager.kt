@@ -1,0 +1,131 @@
+package com.example.alleycat
+
+import android.media.AudioManager
+import android.media.ToneGenerator
+import android.util.Log
+
+/**
+ * Manages game sound effects and audio playback.
+ * Handles ToneGenerator lifecycle to prevent audio resource leaks.
+ */
+object SoundManager {
+    private var toneGenerator: ToneGenerator? = null
+    private const val TAG = "SoundManager"
+
+    /**
+     * Initializes the ToneGenerator for audio playback.
+     * Call this once during app initialization.
+     */
+    fun init() {
+        try {
+            if (toneGenerator == null) {
+                toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize ToneGenerator", e)
+        }
+    }
+
+    /**
+     * Plays jump sound effect (ascending beep).
+     */
+    fun playJumpSound() {
+        try {
+            toneGenerator?.apply {
+                // Ascending beep for jump - creates a "whoosh" effect
+                startTone(ToneGenerator.TONE_PROP_BEEP, 50)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing jump sound", e)
+        }
+    }
+
+    /**
+     * Plays death/life loss sound effect (descending tones).
+     */
+    fun playDeathSound() {
+        try {
+            toneGenerator?.apply {
+                // Descending series of tones for death
+                startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT, 150)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing death sound", e)
+        }
+    }
+
+    /**
+     * Plays streak bonus reward sound (celebratory beep).
+     */
+    fun playScoreBonus() {
+        try {
+            toneGenerator?.apply {
+                // Celebratory triple beep for streak bonus
+                startTone(ToneGenerator.TONE_CDMA_PIP, 80)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing score bonus sound", e)
+        }
+    }
+
+    /**
+     * Plays hazard warning sound.
+     */
+    fun playHazardWarning() {
+        try {
+            toneGenerator?.apply {
+                // Warning sound when hazard appears
+                startTone(ToneGenerator.TONE_PROP_ACK, 200)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing hazard warning", e)
+        }
+    }
+
+    /**
+     * Plays landing confirmation sound.
+     */
+    fun playLandingSound() {
+        try {
+            toneGenerator?.apply {
+                // Soft confirmation sound for landing (use TONE_PROP_BEEP as fallback)
+                startTone(ToneGenerator.TONE_PROP_BEEP, 100)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing landing sound", e)
+        }
+    }
+
+    /**
+     * Plays level completion sound (triumphant tone).
+     */
+    fun playLevelUp() {
+        try {
+            toneGenerator?.apply {
+                // Triumphant sound for level completion
+                startTone(ToneGenerator.TONE_CDMA_CONFIRM, 300)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing level up sound", e)
+        }
+    }
+
+    /**
+     * Releases all audio resources and cleans up ToneGenerator.
+     * Call this in onDestroy() to prevent audio resource leaks.
+     */
+    fun release() {
+        try {
+            toneGenerator?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing ToneGenerator", e)
+        } finally {
+            toneGenerator = null
+        }
+    }
+
+    /**
+     * Checks if SoundManager is initialized and ready to play sounds.
+     */
+    fun isInitialized(): Boolean = toneGenerator != null
+}
