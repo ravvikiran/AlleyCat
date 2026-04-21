@@ -3,13 +3,16 @@ package com.example.alleycat
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.util.Log
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Manages game sound effects and audio playback.
  * Handles ToneGenerator lifecycle to prevent audio resource leaks.
+ * Thread-safe implementation for concurrent sound playback.
  */
 object SoundManager {
     private var toneGenerator: ToneGenerator? = null
+    private val lock = ReentrantReadWriteLock()
     private const val TAG = "SoundManager"
 
     /**
@@ -30,6 +33,7 @@ object SoundManager {
      * Plays jump sound effect (ascending beep).
      */
     fun playJumpSound() {
+        lock.readLock().lock()
         try {
             toneGenerator?.apply {
                 // Ascending beep for jump - creates a "whoosh" effect
@@ -37,6 +41,8 @@ object SoundManager {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error playing jump sound", e)
+        } finally {
+            lock.readLock().unlock()
         }
     }
 
@@ -44,6 +50,7 @@ object SoundManager {
      * Plays death/life loss sound effect (descending tones).
      */
     fun playDeathSound() {
+        lock.readLock().lock()
         try {
             toneGenerator?.apply {
                 // Descending series of tones for death
@@ -51,6 +58,8 @@ object SoundManager {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error playing death sound", e)
+        } finally {
+            lock.readLock().unlock()
         }
     }
 
@@ -58,6 +67,7 @@ object SoundManager {
      * Plays streak bonus reward sound (celebratory beep).
      */
     fun playScoreBonus() {
+        lock.readLock().lock()
         try {
             toneGenerator?.apply {
                 // Celebratory triple beep for streak bonus
@@ -65,6 +75,8 @@ object SoundManager {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error playing score bonus sound", e)
+        } finally {
+            lock.readLock().unlock()
         }
     }
 
@@ -72,6 +84,7 @@ object SoundManager {
      * Plays hazard warning sound.
      */
     fun playHazardWarning() {
+        lock.readLock().lock()
         try {
             toneGenerator?.apply {
                 // Warning sound when hazard appears
@@ -79,6 +92,8 @@ object SoundManager {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error playing hazard warning", e)
+        } finally {
+            lock.readLock().unlock()
         }
     }
 
@@ -86,6 +101,7 @@ object SoundManager {
      * Plays landing confirmation sound.
      */
     fun playLandingSound() {
+        lock.readLock().lock()
         try {
             toneGenerator?.apply {
                 // Soft confirmation sound for landing (use TONE_PROP_BEEP as fallback)
@@ -93,6 +109,8 @@ object SoundManager {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error playing landing sound", e)
+        } finally {
+            lock.readLock().unlock()
         }
     }
 
@@ -100,6 +118,7 @@ object SoundManager {
      * Plays level completion sound (triumphant tone).
      */
     fun playLevelUp() {
+        lock.readLock().lock()
         try {
             toneGenerator?.apply {
                 // Triumphant sound for level completion
@@ -107,6 +126,8 @@ object SoundManager {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error playing level up sound", e)
+        } finally {
+            lock.readLock().unlock()
         }
     }
 
@@ -115,12 +136,14 @@ object SoundManager {
      * Call this in onDestroy() to prevent audio resource leaks.
      */
     fun release() {
+        lock.writeLock().lock()
         try {
             toneGenerator?.release()
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing ToneGenerator", e)
         } finally {
             toneGenerator = null
+            lock.writeLock().unlock()
         }
     }
 

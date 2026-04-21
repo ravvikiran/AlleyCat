@@ -371,6 +371,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             state.copy(isGameOver = true, catState = CatState.DEAD, lives = 0)
         } else {
             // Reset cat to ground, continue game
+            // Clear the lastLandedBinId to ensure consistency between state and local variable
+            lastLandedBinId = null
             state.copy(
                 catY = GROUND_Y,
                 catX = VIEWPORT_WIDTH / 2,
@@ -379,9 +381,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 lives = newLives,
                 streak = 0,  // Reset streak on death
                 lastLandedBinId = ""
-            ).also {
-                lastLandedBinId = null
-            }
+            )
         }
     }
 

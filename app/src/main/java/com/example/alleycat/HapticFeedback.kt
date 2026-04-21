@@ -23,15 +23,26 @@ object HapticFeedback {
         try {
             vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 // API 31+ - Use VibratorManager
-                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-                vibratorManager?.defaultVibrator
+                try {
+                    val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+                    vibratorManager?.defaultVibrator
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to get VibratorManager", e)
+                    null
+                }
             } else {
                 // API <31 - Use Vibrator service directly
-                @Suppress("DEPRECATION")
-                context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+                try {
+                    @Suppress("DEPRECATION")
+                    context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to get Vibrator service", e)
+                    null
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize HapticFeedback", e)
+            vibrator = null
         }
     }
 
