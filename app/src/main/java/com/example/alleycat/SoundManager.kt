@@ -136,14 +136,18 @@ object SoundManager {
      * Call this in onDestroy() to prevent audio resource leaks.
      */
     fun release() {
+        var generatorToRelease: ToneGenerator? = null
         lock.writeLock().lock()
         try {
-            toneGenerator?.release()
+            generatorToRelease = toneGenerator
+            toneGenerator = null
+        } finally {
+            lock.writeLock().unlock()
+        }
+        try {
+            generatorToRelease?.release()
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing ToneGenerator", e)
-        } finally {
-            toneGenerator = null
-            lock.writeLock().unlock()
         }
     }
 

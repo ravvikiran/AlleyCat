@@ -25,7 +25,6 @@ data class GameState(
     val dustbins: List<Dustbin> = emptyList(),
     val gameSpeed: Float = 10f,
     val distanceTraveled: Float = 0f,
-    val lastLandedBinId: String = "",
     val movingLeft: Boolean = false,
     val movingRight: Boolean = false
 )

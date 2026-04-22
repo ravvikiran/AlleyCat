@@ -183,13 +183,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private fun gameLoop() {
         try {
             gameJob = viewModelScope.launch {
-                while (_gameState.value.isGameStarted && !_gameState.value.isGameOver) {
+                while (true) {
+                    val currentState = _gameState.value
+                    if (!currentState.isGameStarted || currentState.isGameOver) {
+                        break
+                    }
                     try {
                         update()
                         delay(GAME_LOOP_TICK_MS)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error in game loop update", e)
-                        // Continue the game loop even if one frame has an error
                     }
                 }
             }
@@ -370,8 +373,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         return if (newLives <= 0) {
             state.copy(isGameOver = true, catState = CatState.DEAD, lives = 0)
         } else {
-            // Reset cat to ground, continue game
-            // Clear the lastLandedBinId to ensure consistency between state and local variable
             lastLandedBinId = null
             state.copy(
                 catY = GROUND_Y,
@@ -379,14 +380,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 velocityY = 0f,
                 catState = CatState.IDLE,
                 lives = newLives,
-                streak = 0,  // Reset streak on death
-                lastLandedBinId = ""
+                streak = 0
             )
         }
     }
 
-    private fun saveHighScore(score: Int) {
-        prefs.edit().putInt("high_score", score).apply()
+private fun saveHighScore(score: Int) {
+        prefs.edit().putInt(HIGH_SCORE_KEY, score).commit()
     }
 
     fun jump() {
