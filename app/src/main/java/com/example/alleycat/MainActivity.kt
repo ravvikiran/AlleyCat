@@ -175,12 +175,12 @@ fun GameScreen(viewModel: GameViewModel = viewModel()) {
 fun GameCanvas(state: GameState) {
     // Cache image resources to prevent reloading on every recomposition
     // This fixes a memory leak where images were loaded repeatedly
-    val bgImage = remember { ImageBitmap.imageResource(id = R.drawable.bg_alley_night) }
-    val catIdle = remember { ImageBitmap.imageResource(id = R.drawable.cat_idle) }
-    val catJump = remember { ImageBitmap.imageResource(id = R.drawable.cat_jump) }
-    val dustbinImg = remember { ImageBitmap.imageResource(id = R.drawable.dustbin) }
-    val hazardDogImg = remember { ImageBitmap.imageResource(id = R.drawable.hazard_dog) }
-    val hazardCatImg = remember { ImageBitmap.imageResource(id = R.drawable.hazard_crazy_cat) }
+    val bgImage = ImageBitmap.imageResource(id = R.drawable.bg_alley_night)
+    val catIdle = ImageBitmap.imageResource(id = R.drawable.cat_idle)
+    val catJump = ImageBitmap.imageResource(id = R.drawable.cat_jump)
+    val dustbinImg = ImageBitmap.imageResource(id = R.drawable.dustbin)
+    val hazardDogImg = ImageBitmap.imageResource(id = R.drawable.hazard_dog)
+    val hazardCatImg = ImageBitmap.imageResource(id = R.drawable.hazard_crazy_cat)
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         val logicalHeight = LOGICAL_HEIGHT
