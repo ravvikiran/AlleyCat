@@ -83,23 +83,40 @@ fun GameScreen(viewModel: GameViewModel = viewModel()) {
                     modifier = Modifier
                         .fillMaxSize()
                         .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = { position ->
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
                                     val screenWidth = size.width
-                                    when {
-                                        position.x < screenWidth * 0.3f -> {
-                                            viewModel.moveLeft()
+
+                                    // Handle press/hold for movement, release to stop
+                                    event.changes.forEach { change ->
+                                        if (change.pressed) {
+                                            val x = change.position.x
+                                            when {
+                                                x < screenWidth * 0.3f -> {
+                                                    viewModel.stopMoveRight()
+                                                    viewModel.moveLeft()
+                                                }
+                                                x > screenWidth * 0.7f -> {
+                                                    viewModel.stopMoveLeft()
+                                                    viewModel.moveRight()
+                                                }
+                                                else -> {
+                                                    // Center zone - jump on press
+                                                    if (change.changedToDown()) {
+                                                        viewModel.jump()
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            // Finger lifted - stop all movement
+                                            viewModel.stopMoveLeft()
+                                            viewModel.stopMoveRight()
                                         }
-                                        position.x > screenWidth * 0.7f -> {
-                                            viewModel.moveRight()
-                                        }
-                                        else -> {
-                                            // Center zone - jump on tap
-                                            viewModel.jump()
-                                        }
+                                        change.consume()
                                     }
                                 }
-                            )
+                            }
                         }
                 )
             }
