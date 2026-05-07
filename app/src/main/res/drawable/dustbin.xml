@@ -1,7 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#8B4513" />
-    <corners android:radius="20dp" />
-    <size android:width="200dp" android:height="250dp" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="250dp"
+    android:viewportWidth="200"
+    android:viewportHeight="250">
+    <!-- Bin body - metallic grey with slight taper -->
+    <path
+        android:fillColor="#5A5A6E"
+        android:pathData="M30,50 L25,230 C25,240 35,245 50,245 L150,245 C165,245 175,240 175,230 L170,50z" />
+    <!-- Bin body highlight (left side) -->
+    <path
+        android:fillColor="#6E6E82"
+        android:pathData="M30,50 L25,230 C25,235 30,238 40,240 L35,50z" />
+    <!-- Bin body shadow (right side) -->
+    <path
+        android:fillColor="#484858"
+        android:pathData="M165,50 L170,50 L175,230 C175,235 172,238 165,240z" />
+    <!-- Lid -->
+    <path
+        android:fillColor="#7A7A8E"
+        android:pathData="M20,40 L180,40 L175,55 L25,55z" />
+    <!-- Lid top -->
+    <path
+        android:fillColor="#8A8A9E"
+        android:pathData="M25,30 L175,30 L180,40 L20,40z" />
+    <!-- Lid handle -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M85,22 Q100,14 115,22"
+        android:strokeWidth="5"
+        android:strokeColor="#9A9AAE"
+        android:strokeLineCap="round" />
+    <!-- Horizontal ridges on bin -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M32,90 L168,90"
+        android:strokeWidth="1.5"
+        android:strokeColor="#4A4A5E" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M30,140 L170,140"
+        android:strokeWidth="1.5"
+        android:strokeColor="#4A4A5E" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M28,190 L172,190"
+        android:strokeWidth="1.5"
+        android:strokeColor="#4A4A5E" />
+    <!-- Bin base rim -->
+    <path
+        android:fillColor="#4A4A5E"
+        android:pathData="M22,235 L178,235 L180,245 L20,245z" />
+    <!-- Subtle neon glow at top (game aesthetic) -->
+    <path
+        android:fillColor="#1100FFFF"
+        android:pathData="M20,30 L180,30 L180,55 L20,55z" />
+</vector>

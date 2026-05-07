@@ -1,6 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="#DC143C" />
-    <size android:width="150dp" android:height="150dp" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="150dp"
+    android:height="150dp"
+    android:viewportWidth="150"
+    android:viewportHeight="150">
+    <!-- Dog body -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M75,50 C60,50 50,60 50,72 C50,84 55,95 62,100 L88,100 C95,95 100,84 100,72 C100,60 90,50 75,50z" />
+    <!-- Dog head -->
+    <path
+        android:fillColor="#A0522D"
+        android:pathData="M75,25 C64,25 55,33 55,42 C55,51 64,58 75,58 C86,58 95,51 95,42 C95,33 86,25 75,25z" />
+    <!-- Left floppy ear -->
+    <path
+        android:fillColor="#6B3410"
+        android:pathData="M58,32 C52,34 48,40 50,46 C52,50 56,50 58,46 C60,42 60,36 58,32z" />
+    <!-- Right floppy ear -->
+    <path
+        android:fillColor="#6B3410"
+        android:pathData="M92,32 C98,34 102,40 100,46 C98,50 94,50 92,46 C90,42 90,36 92,32z" />
+    <!-- Snout -->
+    <path
+        android:fillColor="#D2691E"
+        android:pathData="M68,42 C68,42 66,46 68,50 C70,52 75,53 80,52 C82,50 84,46 82,42 C80,40 70,40 68,42z" />
+    <!-- Nose -->
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M73,44 A3,2.5,0,1,1,73.01,44z" />
+    <!-- Left eye - angry -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,36 A3.5,3,0,1,1,64.01,36z" />
+    <!-- Right eye - angry -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M82,36 A3.5,3,0,1,1,82.01,36z" />
+    <!-- Left pupil -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M64.5,36.5 A2,2,0,1,1,64.51,36.5z" />
+    <!-- Right pupil -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M82.5,36.5 A2,2,0,1,1,82.51,36.5z" />
+    <!-- Angry eyebrows -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M60,32 L68,34"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4A2800"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M90,32 L82,34"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4A2800"
+        android:strokeLineCap="round" />
+    <!-- Open mouth with teeth -->
+    <path
+        android:fillColor="#CC0000"
+        android:pathData="M65,50 Q75,58 85,50z" />
+    <!-- Teeth -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,50 L70,53 L72,50z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M76,50 L78,53 L80,50z" />
+    <!-- Front paws -->
+    <path
+        android:fillColor="#A0522D"
+        android:pathData="M58,98 C56,102 56,108 60,108 L66,108 C68,108 68,102 66,98z" />
+    <path
+        android:fillColor="#A0522D"
+        android:pathData="M82,98 C80,102 80,108 84,108 L90,108 C92,108 92,102 90,98z" />
+    <!-- Collar -->
+    <path
+        android:fillColor="#FF0000"
+        android:pathData="M60,56 L90,56 L90,60 L60,60z" />
+    <!-- Collar tag -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M73,60 A3,3,0,1,1,73.01,60z" />
+    <!-- Danger glow -->
+    <path
+        android:fillColor="#22FF0000"
+        android:pathData="M75,75 A45,45,0,1,1,75.01,75z" />
+</vector>

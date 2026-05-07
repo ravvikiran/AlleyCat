@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Cat silhouette sitting on dustbin - monochrome version -->
+    <!-- Cat body -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,42 C54,42 46,44 44,50 C42,56 42,62 44,66 C46,70 48,72 50,74 L58,74 C60,72 62,70 64,66 C66,62 66,56 64,50 C62,44 54,42 54,42z" />
+    <!-- Cat head -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,32 C48,32 44,36 44,40 C44,44 48,48 54,48 C60,48 64,44 64,40 C64,36 60,32 54,32z" />
+    <!-- Left ear -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M46,34 L44,26 L50,32z" />
+    <!-- Right ear -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M62,34 L64,26 L58,32z" />
+    <!-- Eyes -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,38 A2,2.5,0,1,1,50.01,38z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M58,38 A2,2.5,0,1,1,58.01,38z" />
+    <!-- Tail -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M58,70 Q68,65 66,55 Q65,50 68,46"
+        android:strokeWidth="3"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round" />
+    <!-- Dustbin -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M40,76 L40,88 C40,90 42,92 46,92 L62,92 C66,92 68,90 68,88 L68,76z" />
+    <!-- Dustbin lid -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M38,74 L70,74 L70,78 L38,78z" />
+</vector>

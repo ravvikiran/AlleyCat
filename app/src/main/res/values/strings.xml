@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Alley Cat</string>
+    <string name="app_description">Classic retro arcade cat adventure</string>
+    <string name="start_game">START GAME</string>
+    <string name="how_to_play">HOW TO PLAY</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="level_complete">LEVEL COMPLETE!</string>
+    <string name="play_again">PLAY AGAIN</string>
+    <string name="menu">MENU</string>
+    <string name="resume">RESUME</string>
+    <string name="pause">PAUSE</string>
+    <string name="next_level">NEXT LEVEL</string>
 </resources>

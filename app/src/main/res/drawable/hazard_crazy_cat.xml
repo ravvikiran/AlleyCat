@@ -1,6 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="#8B008B" />
-    <size android:width="150dp" android:height="150dp" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="150dp"
+    android:height="150dp"
+    android:viewportWidth="150"
+    android:viewportHeight="150">
+    <!-- Crazy cat body - arched/puffed up -->
+    <path
+        android:fillColor="#2D2D2D"
+        android:pathData="M75,45 C60,45 48,55 48,68 C48,78 52,88 58,94 L92,94 C98,88 102,78 102,68 C102,55 90,45 75,45z" />
+    <!-- Arched back fur spikes -->
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M55,48 L58,42 L62,48 L66,40 L70,48 L74,38 L78,48 L82,40 L86,48 L90,42 L94,48"
+        android:strokeWidth="0"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M55,48 L58,42 L62,48 L66,40 L70,48 L74,38 L78,48 L82,40 L86,48 L90,42 L94,48 L94,52 L55,52z" />
+    <!-- Cat head -->
+    <path
+        android:fillColor="#333333"
+        android:pathData="M75,22 C64,22 55,30 55,40 C55,50 64,56 75,56 C86,56 95,50 95,40 C95,30 86,22 75,22z" />
+    <!-- Left ear - pointed up aggressively -->
+    <path
+        android:fillColor="#2D2D2D"
+        android:pathData="M60,26 L54,8 L68,22z" />
+    <!-- Right ear -->
+    <path
+        android:fillColor="#2D2D2D"
+        android:pathData="M90,26 L96,8 L82,22z" />
+    <!-- Inner left ear -->
+    <path
+        android:fillColor="#8B008B"
+        android:pathData="M61,25 L56,12 L66,22z" />
+    <!-- Inner right ear -->
+    <path
+        android:fillColor="#8B008B"
+        android:pathData="M89,25 L94,12 L84,22z" />
+    <!-- Left eye - wild/crazy -->
+    <path
+        android:fillColor="#FF00FF"
+        android:pathData="M65,36 A4.5,5,0,1,1,65.01,36z" />
+    <!-- Right eye - wild/crazy -->
+    <path
+        android:fillColor="#FF00FF"
+        android:pathData="M83,36 A4.5,5,0,1,1,83.01,36z" />
+    <!-- Left pupil - slit -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M66,33 L66,40"
+        android:strokeWidth="2"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round" />
+    <!-- Right pupil - slit -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M84,33 L84,40"
+        android:strokeWidth="2"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round" />
+    <!-- Nose -->
+    <path
+        android:fillColor="#FF1493"
+        android:pathData="M73,44 L75,42 L77,44z" />
+    <!-- Hissing mouth -->
+    <path
+        android:fillColor="#660000"
+        android:pathData="M65,47 Q75,56 85,47z" />
+    <!-- Fangs -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M69,47 L70,52 L71,47z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M79,47 L80,52 L81,47z" />
+    <!-- Whiskers - bristled -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M48,36 L62,38"
+        android:strokeWidth="0.8"
+        android:strokeColor="#666666" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M46,40 L62,40"
+        android:strokeWidth="0.8"
+        android:strokeColor="#666666" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M48,44 L62,42"
+        android:strokeWidth="0.8"
+        android:strokeColor="#666666" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M88,38 L102,36"
+        android:strokeWidth="0.8"
+        android:strokeColor="#666666" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M88,40 L104,40"
+        android:strokeWidth="0.8"
+        android:strokeColor="#666666" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M88,42 L102,44"
+        android:strokeWidth="0.8"
+        android:strokeColor="#666666" />
+    <!-- Puffed tail -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M92,85 Q110,75 112,58 Q113,48 118,40"
+        android:strokeWidth="6"
+        android:strokeColor="#2D2D2D"
+        android:strokeLineCap="round" />
+    <!-- Tail fur spikes -->
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M108,62 L112,58 L106,56 L110,52 L104,52 L108,48 L104,46"
+        android:strokeWidth="2"
+        android:strokeColor="#1A1A1A"
+        android:strokeLineCap="round" />
+    <!-- Claws extended -->
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M56,92 L52,98 M58,92 L55,98 M60,92 L58,98" 
+        android:strokeWidth="1.5"
+        android:strokeColor="#CCCCCC"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M90,92 L92,98 M92,92 L95,98 M94,92 L98,98"
+        android:strokeWidth="1.5"
+        android:strokeColor="#CCCCCC"
+        android:strokeLineCap="round" />
+    <!-- Danger aura -->
+    <path
+        android:fillColor="#228B008B"
+        android:pathData="M75,60 A48,48,0,1,1,75.01,60z" />
+</vector>

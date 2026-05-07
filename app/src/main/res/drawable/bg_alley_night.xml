@@ -1,6 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#1a1a2e" />
-    <size android:width="1080dp" android:height="1920dp" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="1080dp"
+    android:height="1920dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1920">
+    <!-- Night sky gradient -->
+    <path
+        android:pathData="M0,0h1080v1920h-1080z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="540"
+                android:startY="0"
+                android:endX="540"
+                android:endY="1920"
+                android:type="linear">
+                <item android:color="#FF0A0A1A" android:offset="0.0" />
+                <item android:color="#FF0D1B2A" android:offset="0.3" />
+                <item android:color="#FF1B2838" android:offset="0.6" />
+                <item android:color="#FF1A1A2E" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Distant buildings silhouette -->
+    <path
+        android:fillColor="#0F1520"
+        android:pathData="M0,600 L0,1920 L1080,1920 L1080,550 L1050,550 L1050,480 L1020,480 L1020,520 L980,520 L980,420 L950,420 L950,500 L900,500 L900,380 L870,380 L870,450 L820,450 L820,350 L790,350 L790,480 L740,480 L740,400 L700,400 L700,520 L660,520 L660,440 L620,440 L620,360 L590,360 L590,480 L540,480 L540,380 L500,380 L500,500 L460,500 L460,420 L420,420 L420,520 L380,520 L380,450 L340,450 L340,380 L310,380 L310,500 L260,500 L260,440 L220,440 L220,520 L180,520 L180,460 L140,460 L140,550 L100,550 L100,480 L60,480 L60,560 L0,560z" />
+    <!-- Mid-ground buildings -->
+    <path
+        android:fillColor="#141E2A"
+        android:pathData="M0,800 L0,1920 L1080,1920 L1080,750 L1040,750 L1040,680 L1000,680 L1000,720 L960,720 L960,650 L920,650 L920,700 L880,700 L880,620 L840,620 L840,680 L800,680 L800,600 L760,600 L760,700 L720,720 L680,720 L680,640 L640,640 L640,700 L600,700 L600,620 L560,620 L560,680 L520,680 L520,600 L480,600 L480,700 L440,700 L440,650 L400,650 L400,720 L360,720 L360,660 L320,660 L320,740 L280,740 L280,680 L240,680 L240,750 L200,750 L200,700 L160,700 L160,760 L120,760 L120,700 L80,700 L80,780 L40,780 L40,720 L0,720z" />
+    <!-- Alley ground -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M0,1400 L1080,1400 L1080,1920 L0,1920z" />
+    <!-- Ground texture lines -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,1420 L1080,1420"
+        android:strokeWidth="2"
+        android:strokeColor="#22FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,1500 L1080,1500"
+        android:strokeWidth="1"
+        android:strokeColor="#11FFFFFF" />
+    <!-- Window lights on buildings -->
+    <path android:fillColor="#33FFFF00" android:pathData="M870,400 L880,400 L880,410 L870,410z" />
+    <path android:fillColor="#33FFFF00" android:pathData="M870,420 L880,420 L880,430 L870,430z" />
+    <path android:fillColor="#22FFFF00" android:pathData="M530,400 L540,400 L540,410 L530,410z" />
+    <path android:fillColor="#22FFFF00" android:pathData="M530,420 L540,420 L540,430 L530,430z" />
+    <path android:fillColor="#33FFFF00" android:pathData="M310,400 L320,400 L320,410 L310,410z" />
+    <path android:fillColor="#22FFFF00" android:pathData="M700,430 L710,430 L710,440 L700,440z" />
+    <path android:fillColor="#33FFFF00" android:pathData="M150,480 L160,480 L160,490 L150,490z" />
+    <path android:fillColor="#22FFFF00" android:pathData="M950,440 L960,440 L960,450 L950,450z" />
+    <!-- Moon -->
+    <path
+        android:fillColor="#EEEEFF"
+        android:pathData="M900,120 A40,40,0,1,1,900.01,120z" />
+    <!-- Moon shadow (crescent effect) -->
+    <path
+        android:fillColor="#0A0A1A"
+        android:pathData="M910,120 A35,35,0,1,1,910.01,120z" />
+    <!-- Stars -->
+    <path android:fillColor="#FFFFFF" android:pathData="M100,80 A1.5,1.5,0,1,1,100.01,80z" />
+    <path android:fillColor="#CCCCFF" android:pathData="M250,50 A1,1,0,1,1,250.01,50z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M400,100 A1.5,1.5,0,1,1,400.01,100z" />
+    <path android:fillColor="#CCCCFF" android:pathData="M550,60 A1,1,0,1,1,550.01,60z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M700,90 A1.5,1.5,0,1,1,700.01,90z" />
+    <path android:fillColor="#CCCCFF" android:pathData="M150,200 A1,1,0,1,1,150.01,200z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M350,180 A1,1,0,1,1,350.01,180z" />
+    <path android:fillColor="#CCCCFF" android:pathData="M600,150 A1.5,1.5,0,1,1,600.01,150z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M800,200 A1,1,0,1,1,800.01,200z" />
+    <path android:fillColor="#CCCCFF" android:pathData="M50,300 A1,1,0,1,1,50.01,300z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M480,250 A1.5,1.5,0,1,1,480.01,250z" />
+    <path android:fillColor="#CCCCFF" android:pathData="M1000,150 A1,1,0,1,1,1000.01,150z" />
+</vector>

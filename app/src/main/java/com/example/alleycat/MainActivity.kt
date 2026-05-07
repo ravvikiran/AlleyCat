@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
@@ -313,64 +314,365 @@ fun GameCanvas(state: GameState) {
 @Composable
 fun LoadingScreen() {
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
+    
+    // Pulsing glow animation
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow"
+    )
+    
+    // Cat eyes blinking
+    val eyeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.1f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 3000
+                1f at 0
+                1f at 2600
+                0.1f at 2700
+                1f at 2800
+                1f at 3000
+            },
             repeatMode = RepeatMode.Restart
         ),
-        label = "rotation"
+        label = "blink"
+    )
+    
+    // Paw print trail animation
+    val pawProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2500, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "paws"
+    )
+
+    // Loading dots animation
+    val dotsAlpha1 by infiniteTransition.animateFloat(
+        initialValue = 0.2f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600), repeatMode = RepeatMode.Reverse
+        ), label = "dot1"
+    )
+    val dotsAlpha2 by infiniteTransition.animateFloat(
+        initialValue = 0.2f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, delayMillis = 200), repeatMode = RepeatMode.Reverse
+        ), label = "dot2"
+    )
+    val dotsAlpha3 by infiniteTransition.animateFloat(
+        initialValue = 0.2f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, delayMillis = 400), repeatMode = RepeatMode.Reverse
+        ), label = "dot3"
     )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF0A0A1A),
+                        Color(0xFF0D1B2A),
+                        Color(0xFF1A1A2E)
+                    )
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(
-                    progress = { 0.6f },
-                    modifier = Modifier
-                        .size(100.dp)
-                        .graphicsLayer { rotationZ = rotation },
-                    color = Color.Magenta,
-                    strokeWidth = 6.dp,
-                    strokeCap = StrokeCap.Round,
+        // Paw print trail at the bottom
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 60.dp)
+        ) {
+            val pawSize = 12f
+            val spacing = size.width / 6
+            for (i in 0..5) {
+                val alpha = ((pawProgress * 6 - i).coerceIn(0f, 1f)) * 0.6f
+                val offsetY = if (i % 2 == 0) 0f else 15f
+                // Main pad
+                drawCircle(
+                    color = Color.Cyan.copy(alpha = alpha),
+                    radius = pawSize,
+                    center = Offset(spacing * i + spacing / 2, size.height / 2 + offsetY)
                 )
-                Text(
-                    text = "CAT",
-                    color = Color.Cyan,
-                    fontWeight = FontWeight.Black,
-                    fontSize = 22.sp,
-                    fontFamily = FontFamily.Monospace
+                // Toe beans
+                drawCircle(
+                    color = Color.Cyan.copy(alpha = alpha * 0.8f),
+                    radius = pawSize * 0.4f,
+                    center = Offset(spacing * i + spacing / 2 - 8f, size.height / 2 + offsetY - 14f)
+                )
+                drawCircle(
+                    color = Color.Cyan.copy(alpha = alpha * 0.8f),
+                    radius = pawSize * 0.4f,
+                    center = Offset(spacing * i + spacing / 2 + 8f, size.height / 2 + offsetY - 14f)
+                )
+                drawCircle(
+                    color = Color.Cyan.copy(alpha = alpha * 0.8f),
+                    radius = pawSize * 0.35f,
+                    center = Offset(spacing * i + spacing / 2, size.height / 2 + offsetY - 18f)
                 )
             }
-            Spacer(modifier = Modifier.height(48.dp))
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        ) {
+            // Cat face icon with glowing eyes
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(160.dp)
+            ) {
+                // Outer glow ring
+                Canvas(modifier = Modifier.size(160.dp)) {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color.Magenta.copy(alpha = glowAlpha * 0.3f),
+                                Color.Transparent
+                            )
+                        ),
+                        radius = size.minDimension / 2
+                    )
+                }
+                
+                // Cat face
+                Canvas(modifier = Modifier.size(120.dp)) {
+                    val cx = size.width / 2
+                    val cy = size.height / 2
+                    
+                    // Head
+                    drawCircle(
+                        color = Color(0xFFFFA500),
+                        radius = 45f,
+                        center = Offset(cx, cy + 5f)
+                    )
+                    
+                    // Left ear
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(cx - 30f, cy - 20f)
+                            lineTo(cx - 38f, cy - 55f)
+                            lineTo(cx - 12f, cy - 30f)
+                            close()
+                        },
+                        color = Color(0xFFFF8C00)
+                    )
+                    // Right ear
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(cx + 30f, cy - 20f)
+                            lineTo(cx + 38f, cy - 55f)
+                            lineTo(cx + 12f, cy - 30f)
+                            close()
+                        },
+                        color = Color(0xFFFF8C00)
+                    )
+                    
+                    // Inner ears
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(cx - 28f, cy - 22f)
+                            lineTo(cx - 34f, cy - 48f)
+                            lineTo(cx - 15f, cy - 28f)
+                            close()
+                        },
+                        color = Color(0xFFFFB6C1)
+                    )
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(cx + 28f, cy - 22f)
+                            lineTo(cx + 34f, cy - 48f)
+                            lineTo(cx + 15f, cy - 28f)
+                            close()
+                        },
+                        color = Color(0xFFFFB6C1)
+                    )
+                    
+                    // Eyes with glow
+                    val eyeColor = Color(0xFF00FF00).copy(alpha = glowAlpha)
+                    drawCircle(color = eyeColor, radius = 10f * eyeScale.coerceAtLeast(0.3f), center = Offset(cx - 15f, cy))
+                    drawCircle(color = eyeColor, radius = 10f * eyeScale.coerceAtLeast(0.3f), center = Offset(cx + 15f, cy))
+                    
+                    // Pupils
+                    if (eyeScale > 0.5f) {
+                        drawCircle(color = Color.Black, radius = 5f, center = Offset(cx - 15f, cy))
+                        drawCircle(color = Color.Black, radius = 5f, center = Offset(cx + 15f, cy))
+                    }
+                    
+                    // Nose
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(cx - 4f, cy + 14f)
+                            lineTo(cx, cy + 10f)
+                            lineTo(cx + 4f, cy + 14f)
+                            close()
+                        },
+                        color = Color(0xFFFF69B4)
+                    )
+                    
+                    // Whiskers
+                    drawLine(Color.Gray, Offset(cx - 45f, cy + 8f), Offset(cx - 18f, cy + 10f), strokeWidth = 1.5f)
+                    drawLine(Color.Gray, Offset(cx - 45f, cy + 14f), Offset(cx - 18f, cy + 14f), strokeWidth = 1.5f)
+                    drawLine(Color.Gray, Offset(cx + 18f, cy + 10f), Offset(cx + 45f, cy + 8f), strokeWidth = 1.5f)
+                    drawLine(Color.Gray, Offset(cx + 18f, cy + 14f), Offset(cx + 45f, cy + 14f), strokeWidth = 1.5f)
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(40.dp))
+            
+            // Game title
             Text(
-                text = "LOADING VIRTUAL ALLEY...",
-                color = Color.Cyan,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 3.sp
+                text = "ALLEY CAT",
+                color = Color(0xFFFF00FF),
+                fontSize = 48.sp,
+                fontWeight = FontWeight.Black,
+                fontFamily = FontFamily.Cursive,
+                style = androidx.compose.ui.text.TextStyle(
+                    shadow = Shadow(color = Color(0xAADD00DD), blurRadius = 30f)
+                )
             )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "RETRO ARCADE SURVIVAL",
+                color = Color.Cyan.copy(alpha = 0.8f),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 4.sp
+            )
+            
+            Spacer(modifier = Modifier.height(60.dp))
+            
+            // Loading indicator with animated dots
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "LOADING",
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 3.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(".", color = Color.Cyan.copy(alpha = dotsAlpha1), fontSize = 20.sp, fontWeight = FontWeight.Black)
+                Text(".", color = Color.Cyan.copy(alpha = dotsAlpha2), fontSize = 20.sp, fontWeight = FontWeight.Black)
+                Text(".", color = Color.Cyan.copy(alpha = dotsAlpha3), fontSize = 20.sp, fontWeight = FontWeight.Black)
+            }
         }
     }
 }
 
 @Composable
 fun SplashScreen(onStart: () -> Unit, onShowInstructions: () -> Unit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "splash")
+    
+    // Floating animation for title
+    val titleOffset by infiniteTransition.animateFloat(
+        initialValue = -3f,
+        targetValue = 3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "titleFloat"
+    )
+    
+    // Button pulse
+    val buttonGlow by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "buttonGlow"
+    )
+    
+    // Star twinkle
+    val starAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 0.9f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "stars"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(
-                colors = listOf(Color(0xCC110033), Color(0xCC000011))
-            )),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF0A0A1A),
+                        Color(0xFF110033),
+                        Color(0xFF0D1B2A)
+                    )
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // Background stars
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val starPositions = listOf(
+                Offset(size.width * 0.1f, size.height * 0.08f),
+                Offset(size.width * 0.25f, size.height * 0.15f),
+                Offset(size.width * 0.4f, size.height * 0.05f),
+                Offset(size.width * 0.6f, size.height * 0.12f),
+                Offset(size.width * 0.75f, size.height * 0.07f),
+                Offset(size.width * 0.9f, size.height * 0.18f),
+                Offset(size.width * 0.15f, size.height * 0.25f),
+                Offset(size.width * 0.85f, size.height * 0.3f),
+                Offset(size.width * 0.5f, size.height * 0.22f),
+                Offset(size.width * 0.35f, size.height * 0.88f),
+                Offset(size.width * 0.7f, size.height * 0.85f),
+                Offset(size.width * 0.92f, size.height * 0.9f),
+            )
+            starPositions.forEachIndexed { index, pos ->
+                val alpha = if (index % 2 == 0) starAlpha else 1f - starAlpha + 0.3f
+                drawCircle(
+                    color = Color.White.copy(alpha = alpha.coerceIn(0.1f, 0.9f)),
+                    radius = if (index % 3 == 0) 2f else 1.5f,
+                    center = pos
+                )
+            }
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        ) {
+            Spacer(modifier = Modifier.height(60.dp))
+            
+            // Cat emoji with glow
+            Text(
+                text = "🐱",
+                fontSize = 64.sp,
+                modifier = Modifier.graphicsLayer { translationY = titleOffset * 2 }
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Main title with float animation
             Text(
                 text = "ALLEY CAT",
                 color = Color(0xFFFF00FF),
@@ -379,9 +681,12 @@ fun SplashScreen(onStart: () -> Unit, onShowInstructions: () -> Unit) {
                 fontFamily = FontFamily.Cursive,
                 style = androidx.compose.ui.text.TextStyle(
                     shadow = Shadow(color = Color(0xAADD00DD), blurRadius = 40f)
-                )
+                ),
+                modifier = Modifier.graphicsLayer { translationY = titleOffset }
             )
+            
             Spacer(modifier = Modifier.height(8.dp))
+            
             Text(
                 text = "RETRO ARCADE SURVIVAL",
                 color = Color.Cyan,
@@ -389,30 +694,85 @@ fun SplashScreen(onStart: () -> Unit, onShowInstructions: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 4.sp
             )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Tagline
+            Text(
+                text = "Jump. Dodge. Survive the alley.",
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                fontFamily = FontFamily.Monospace
+            )
+            
             Spacer(modifier = Modifier.height(80.dp))
             
-            Button(
-                onClick = onStart,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                contentPadding = PaddingValues(0.dp),
+            // Start button with animated glow
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .width(220.dp)
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Brush.horizontalGradient(listOf(Color(0xFF00FFFF), Color(0xFF0088FF))))
+                    .width(240.dp)
+                    .height(60.dp)
             ) {
-                Text("START GAME", color = Color.Black, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                // Glow behind button
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    drawRoundRect(
+                        brush = Brush.horizontalGradient(
+                            listOf(
+                                Color(0xFF00FFFF).copy(alpha = buttonGlow * 0.4f),
+                                Color(0xFF0088FF).copy(alpha = buttonGlow * 0.4f)
+                            )
+                        ),
+                        cornerRadius = CornerRadius(32f, 32f),
+                        size = Size(size.width + 8f, size.height + 8f),
+                        topLeft = Offset(-4f, -4f)
+                    )
+                }
+                
+                Button(
+                    onClick = onStart,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(Color(0xFF00FFFF), Color(0xFF0088FF))
+                            )
+                        )
+                ) {
+                    Text(
+                        "▶  START GAME",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 20.sp
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(24.dp))
             
             TextButton(onClick = onShowInstructions) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Info, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Info, contentDescription = "How to play", tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("HOW TO PLAY", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Text("HOW TO PLAY", color = Color.White.copy(alpha = 0.8f), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
             }
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Version info at bottom
+            Text(
+                text = "v1.0 • Classic Arcade Reimagined",
+                color = Color.White.copy(alpha = 0.3f),
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

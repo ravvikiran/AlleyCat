@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Circular background with gradient feel -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M100,100 A90,90,0,1,1,100.01,100z" />
+    <!-- Neon ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M100,100 A80,80,0,1,1,100.01,100"
+        android:strokeWidth="2"
+        android:strokeColor="#44FF00FF" />
+    <!-- Cat body -->
+    <path
+        android:fillColor="#FF8C00"
+        android:pathData="M100,70 C90,70 82,78 82,88 C82,98 86,108 92,114 L108,114 C114,108 118,98 118,88 C118,78 110,70 100,70z" />
+    <!-- Cat head -->
+    <path
+        android:fillColor="#FFA500"
+        android:pathData="M100,48 C92,48 86,54 86,60 C86,66 92,72 100,72 C108,72 114,66 114,60 C114,54 108,48 100,48z" />
+    <!-- Left ear -->
+    <path
+        android:fillColor="#FF8C00"
+        android:pathData="M90,52 L86,40 L96,50z" />
+    <!-- Right ear -->
+    <path
+        android:fillColor="#FF8C00"
+        android:pathData="M110,52 L114,40 L104,50z" />
+    <!-- Inner ears -->
+    <path
+        android:fillColor="#FFB6C1"
+        android:pathData="M91,51 L88,42 L95,50z" />
+    <path
+        android:fillColor="#FFB6C1"
+        android:pathData="M109,51 L112,42 L105,50z" />
+    <!-- Eyes - glowing green -->
+    <path
+        android:fillColor="#00FF00"
+        android:pathData="M94,58 A3,3.5,0,1,1,94.01,58z" />
+    <path
+        android:fillColor="#00FF00"
+        android:pathData="M106,58 A3,3.5,0,1,1,106.01,58z" />
+    <!-- Pupils -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M94.5,58.5 A1.5,2.5,0,1,1,94.51,58.5z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M106.5,58.5 A1.5,2.5,0,1,1,106.51,58.5z" />
+    <!-- Nose -->
+    <path
+        android:fillColor="#FF69B4"
+        android:pathData="M98.5,64 L100,62.5 L101.5,64z" />
+    <!-- Smile -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M96,66 Q100,69 104,66"
+        android:strokeWidth="1.2"
+        android:strokeColor="#444444" />
+    <!-- Tail -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M112,105 Q125,95 123,82 Q122,76 126,72"
+        android:strokeWidth="5"
+        android:strokeColor="#FF8C00"
+        android:strokeLineCap="round" />
+    <!-- Dustbin below cat -->
+    <path
+        android:fillColor="#6B6B6B"
+        android:pathData="M78,116 L78,140 C78,144 82,146 90,146 L110,146 C118,146 122,144 122,140 L122,116z" />
+    <!-- Dustbin lid -->
+    <path
+        android:fillColor="#888888"
+        android:pathData="M74,112 L126,112 L124,118 L76,118z" />
+    <!-- Stars around -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,40 A1.5,1.5,0,1,1,40.01,40z" />
+    <path
+        android:fillColor="#CCCCFF"
+        android:pathData="M160,45 A1.5,1.5,0,1,1,160.01,45z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,100 A1,1,0,1,1,35.01,100z" />
+    <path
+        android:fillColor="#CCCCFF"
+        android:pathData="M165,95 A1,1,0,1,1,165.01,95z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,155 A1.5,1.5,0,1,1,50.01,155z" />
+    <path
+        android:fillColor="#CCCCFF"
+        android:pathData="M150,160 A1,1,0,1,1,150.01,160z" />
+</vector>
