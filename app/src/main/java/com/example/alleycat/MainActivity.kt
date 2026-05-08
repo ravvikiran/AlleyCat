@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.alleycat.ui.theme.AlleyCatTheme
 
@@ -47,14 +49,24 @@ private val WarmGold = Color(0xFFFFB347)     // Warm gold
 private val CatOrangeColor = Color(0xFFFF8C00)
 
 class MainActivity : ComponentActivity() {
+    private var gameViewModel: GameViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         SoundManager.init()
         HapticFeedback.init(this)
+        
+        // Add lifecycle observer for auto-pause on app background (Task 6.3)
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
+                gameViewModel?.togglePause()
+            }
+        })
+        
         setContent {
             AlleyCatTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = SkyBottom) {
-                    GameScreen()
+                    GameScreen(onViewModelReady = { gameViewModel = it })
                 }
             }
         }
@@ -68,8 +80,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GameScreen(viewModel: GameViewModel = viewModel()) {
+fun GameScreen(viewModel: GameViewModel = viewModel(), onViewModelReady: ((GameViewModel) -> Unit)? = null) {
     val state by viewModel.gameState.collectAsState()
+    
+    // Notify parent about ViewModel reference for lifecycle observer
+    LaunchedEffect(viewModel) {
+        onViewModelReady?.invoke(viewModel)
+    }
 
     if (state.isLoading) {
         LoadingScreen()
@@ -79,17 +96,21 @@ fun GameScreen(viewModel: GameViewModel = viewModel()) {
 
             // Tutorial overlay hints
             if (state.isTutorial && state.tutorialStep in 1..3) {
-                TutorialHint(step = state.tutorialStep, onNext = { viewModel.advanceTutorial() })
+                TutorialHint(
+                    step = state.tutorialStep,
+                    onNext = { viewModel.advanceTutorial() },
+                    onSkip = { viewModel.skipTutorial() }
+                )
             }
 
             // Control Zones
             if (state.isGameStarted && !state.isGameOver && !state.showLevelComplete && !state.isPaused) {
                 Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(0.3f).align(Alignment.CenterStart)
-                    .pointerInput(Unit) { detectTapGestures(onPress = { viewModel.moveLeft(); if (state.isTutorial && state.tutorialStep == 1) viewModel.advanceTutorial(); tryAwaitRelease(); viewModel.stopMoveLeft() }) })
+                    .pointerInput(Unit) { detectTapGestures(onPress = { viewModel.moveLeft(); if (state.isTutorial && state.tutorialStep == 1) viewModel.onTutorialMoveLeft(); tryAwaitRelease(); viewModel.stopMoveLeft() }) })
                 Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(0.4f).align(Alignment.Center)
                     .pointerInput(Unit) { detectTapGestures(onTap = { viewModel.jump(); if (state.isTutorial && state.tutorialStep == 2) viewModel.advanceTutorial() }) })
                 Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(0.3f).align(Alignment.CenterEnd)
-                    .pointerInput(Unit) { detectTapGestures(onPress = { viewModel.moveRight(); if (state.isTutorial && state.tutorialStep == 1) viewModel.advanceTutorial(); tryAwaitRelease(); viewModel.stopMoveRight() }) })
+                    .pointerInput(Unit) { detectTapGestures(onPress = { viewModel.moveRight(); if (state.isTutorial && state.tutorialStep == 1) viewModel.onTutorialMoveRight(); tryAwaitRelease(); viewModel.stopMoveRight() }) })
             }
 
             // HUD
@@ -125,7 +146,9 @@ fun GameScreen(viewModel: GameViewModel = viewModel()) {
             // Level Complete
             if (state.showLevelComplete) {
                 val levelData = LevelSystem.getLevelData(state.currentLevel)
-                LevelCompleteOverlay(currentLevel = state.currentLevel, levelName = levelData.name, score = state.score,
+                val nextLevelData = LevelSystem.getLevelData(state.currentLevel + 1)
+                LevelCompleteOverlay(currentLevel = state.currentLevel, levelName = levelData.name, 
+                    nextLevelName = nextLevelData.name, score = state.score,
                     hasNextLevel = true, isLastMainLevel = state.currentLevel >= LevelSystem.getTotalLevels(),
                     onContinue = { viewModel.startNextLevel() }, onHome = { viewModel.resetToHome() })
             }
@@ -201,6 +224,38 @@ fun GameCanvas(state: GameState) {
                 drawCircle(color = Color.White, radius = hzWidth * 0.06f, center = Offset(hxX + hzWidth * 0.65f, currentY - hzWidth * 0.08f))
             }
 
+            // Rival cat warning indicator (Task 14.2)
+            if (bin.hasHazard && bin.hazardType == HazardType.CRAZY_CAT 
+                && bin.hazardYOffset > 0f && bin.hazardYOffset < HAZARD_COLLISION_THRESHOLD) {
+                // Pulsing warning glow above the dustbin
+                val pulseAlpha = (0.4f + 0.4f * kotlin.math.sin(bin.hazardYOffset * 20f).toFloat())
+                val warningCenterX = scaledX + scaledWidth / 2
+                val warningCenterY = scaledY - 30f * canvasScale
+                // Red/orange glow
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        listOf(Color(0xFFFF4500).copy(alpha = pulseAlpha), Color.Transparent),
+                        center = Offset(warningCenterX, warningCenterY),
+                        radius = 25f * canvasScale
+                    ),
+                    radius = 25f * canvasScale,
+                    center = Offset(warningCenterX, warningCenterY)
+                )
+                // Exclamation mark
+                val exclamationSize = 12f * canvasScale * (0.8f + 0.2f * pulseAlpha)
+                drawRoundRect(
+                    color = Color(0xFFFF4500).copy(alpha = pulseAlpha + 0.3f),
+                    topLeft = Offset(warningCenterX - exclamationSize * 0.15f, warningCenterY - exclamationSize),
+                    size = Size(exclamationSize * 0.3f, exclamationSize * 1.4f),
+                    cornerRadius = CornerRadius(3f)
+                )
+                drawCircle(
+                    color = Color(0xFFFF4500).copy(alpha = pulseAlpha + 0.3f),
+                    radius = exclamationSize * 0.2f,
+                    center = Offset(warningCenterX, warningCenterY + exclamationSize * 0.7f)
+                )
+            }
+
             // Bin body
             drawRoundRect(color = BinColor, topLeft = Offset(scaledX, scaledY), size = Size(scaledWidth, binHeight), cornerRadius = CornerRadius(6f))
             // Bin lid
@@ -208,6 +263,48 @@ fun GameCanvas(state: GameState) {
             // Graffiti tag on bin (random color per bin)
             val tagColor = listOf(GraffitiPink, GraffitiBlue, GraffitiLime, GraffitiYellow)[bin.id.hashCode().and(3)]
             drawRoundRect(color = tagColor.copy(alpha = 0.5f), topLeft = Offset(scaledX + scaledWidth * 0.2f, scaledY + binHeight * 0.4f), size = Size(scaledWidth * 0.6f, binHeight * 0.15f), cornerRadius = CornerRadius(3f))
+        }
+
+        // === FOOD ITEMS (Task 14.1) ===
+        state.foodItems.forEach { food ->
+            val foodX = food.x * canvasScale
+            val foodY = food.y * canvasScale
+            val foodW = food.width * canvasScale
+            val foodH = food.height * canvasScale
+            val foodCenterX = foodX + foodW / 2
+            val foodCenterY = foodY + foodH / 2
+
+            // Food type color
+            val foodColor = when (food.foodType) {
+                FoodType.FISH -> Color(0xFF4FC3F7)    // Blue for fish
+                FoodType.MILK -> Color(0xFFF5F5F5)    // White for milk
+                FoodType.CHEESE -> Color(0xFFFFEB3B)  // Yellow for cheese
+            }
+
+            // Glow effect behind food item
+            drawCircle(
+                brush = Brush.radialGradient(
+                    listOf(foodColor.copy(alpha = 0.4f), Color.Transparent),
+                    center = Offset(foodCenterX, foodCenterY),
+                    radius = foodW * 0.8f
+                ),
+                radius = foodW * 0.8f,
+                center = Offset(foodCenterX, foodCenterY)
+            )
+
+            // Food item body (oval)
+            drawOval(
+                color = foodColor,
+                topLeft = Offset(foodX, foodY),
+                size = Size(foodW, foodH)
+            )
+
+            // Inner highlight for depth
+            drawOval(
+                color = Color.White.copy(alpha = 0.3f),
+                topLeft = Offset(foodX + foodW * 0.2f, foodY + foodH * 0.15f),
+                size = Size(foodW * 0.4f, foodH * 0.35f)
+            )
         }
 
         // === THE CAT ===
@@ -298,11 +395,11 @@ fun SplashScreen(onStart: () -> Unit, onTutorial: () -> Unit, showTutorialButton
 
 // === TUTORIAL HINT OVERLAY ===
 @Composable
-fun TutorialHint(step: Int, onNext: () -> Unit) {
+fun TutorialHint(step: Int, onNext: () -> Unit, onSkip: () -> Unit) {
     val message = when (step) {
-        1 -> "👈  HOLD LEFT or RIGHT side\n     to move the cat"
+        1 -> "👈  HOLD LEFT side, then RIGHT side\n     to move the cat (both required)"
         2 -> "👆  TAP the CENTER\n     to JUMP onto a bin!"
-        3 -> "🎯  Great! Land on bins to score.\n     Avoid hazards. You got this!"
+        3 -> "🎯  Great! Land on bins to score.\n     Jump and land on a dustbin!"
         else -> ""
     }
     val highlightZone = when (step) {
@@ -322,14 +419,18 @@ fun TutorialHint(step: Int, onNext: () -> Unit) {
 
         // Hint card at top
         Column(modifier = Modifier.align(Alignment.TopCenter).padding(top = 80.dp).background(Color.Black.copy(alpha = 0.85f), RoundedCornerShape(16.dp)).border(2.dp, GraffitiYellow, RoundedCornerShape(16.dp)).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("TUTORIAL", color = GraffitiYellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+            // Step progress indicator
+            Text("TUTORIAL • Step $step/3", color = GraffitiYellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
             Spacer(Modifier.height(12.dp))
             Text(message, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium, lineHeight = 24.sp)
-            if (step == 3) {
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = onNext, colors = ButtonDefaults.buttonColors(containerColor = GraffitiLime), shape = RoundedCornerShape(12.dp)) {
-                    Text("GOT IT!", color = Color.Black, fontWeight = FontWeight.Black)
-                }
+            Spacer(Modifier.height(16.dp))
+            // Skip button on all steps
+            OutlinedButton(
+                onClick = onSkip,
+                border = BorderStroke(1.dp, Color.Gray),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("SKIP TUTORIAL", color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Medium, fontSize = 13.sp)
             }
         }
     }
@@ -398,7 +499,7 @@ fun InstructionRow(icon: String, text: String) {
 
 // === LEVEL COMPLETE ===
 @Composable
-fun LevelCompleteOverlay(currentLevel: Int, levelName: String, score: Int, hasNextLevel: Boolean, isLastMainLevel: Boolean = false, onContinue: () -> Unit, onHome: () -> Unit) {
+fun LevelCompleteOverlay(currentLevel: Int, levelName: String, nextLevelName: String = "", score: Int, hasNextLevel: Boolean, isLastMainLevel: Boolean = false, onContinue: () -> Unit, onHome: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF1A4D1A), Color(0xFF0A2A0A)))), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(BuildingMid, RoundedCornerShape(24.dp)).border(3.dp, GraffitiLime.copy(alpha = 0.7f), RoundedCornerShape(24.dp)).padding(36.dp)) {
             Text("🎉", fontSize = 64.sp)
@@ -406,6 +507,10 @@ fun LevelCompleteOverlay(currentLevel: Int, levelName: String, score: Int, hasNe
             Text("LEVEL COMPLETE!", color = GraffitiLime, fontSize = 32.sp, fontWeight = FontWeight.Black)
             Spacer(Modifier.height(12.dp))
             Text(levelName, color = GraffitiBlue, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            if (nextLevelName.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Text("NEXT: $nextLevelName", color = WarmGold.copy(alpha = 0.7f), fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            }
             Spacer(Modifier.height(20.dp))
             Text("SCORE: $score", color = WarmGold, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             if (isLastMainLevel) { Spacer(Modifier.height(12.dp)); Text("✨ MYSTERY ALLEYS UNLOCKED!", color = GraffitiYellow, fontSize = 13.sp, fontWeight = FontWeight.Bold) }

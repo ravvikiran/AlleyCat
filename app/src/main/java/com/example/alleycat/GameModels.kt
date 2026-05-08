@@ -23,6 +23,7 @@ data class GameState(
     val showInstructions: Boolean = false,
     val showLevelComplete: Boolean = false,
     val dustbins: List<Dustbin> = emptyList(),
+    val foodItems: List<FoodItem> = emptyList(),
     val gameSpeed: Float = 10f,
     val distanceTraveled: Float = 0f,
     val movingLeft: Boolean = false,
@@ -30,7 +31,9 @@ data class GameState(
     // Tutorial system
     val isTutorial: Boolean = false,
     val tutorialStep: Int = 0,  // 0=not started, 1=move, 2=jump, 3=land, 4=done
-    val tutorialCompleted: Boolean = false
+    val tutorialCompleted: Boolean = false,
+    val tutorialMovedLeft: Boolean = false,
+    val tutorialMovedRight: Boolean = false
 )
 
 /**
@@ -42,7 +45,7 @@ enum class CatState {
 
 /**
  * Data class representing a dustbin in the game world.
- * Contains position, hazard information, and animation state.
+ * Contains position, hazard information, food state, and animation state.
  */
 data class Dustbin(
     val id: String = UUID.randomUUID().toString(),
@@ -51,7 +54,11 @@ data class Dustbin(
     val height: Float = 250f,
     val hasHazard: Boolean = false,
     val hazardType: HazardType = HazardType.NONE,
-    val hazardYOffset: Float = 0f // 0f means hidden in bin, 1f means fully visible
+    val hazardYOffset: Float = 0f, // 0f means hidden in bin, 1f means fully visible
+    val hasFood: Boolean = false,       // Whether this bin contains food
+    val foodCollected: Boolean = false,  // Whether food was already collected from this bin
+    val hazardWarned: Boolean = false,   // Whether hazard warning was already triggered for this bin
+    val hazardEscapeFrames: Int = 0      // Frame counter for escape window when hazard emerges
 )
 
 /**
@@ -60,3 +67,27 @@ data class Dustbin(
 enum class HazardType {
     NONE, DOG, CRAZY_CAT
 }
+
+/**
+ * Enumeration of food types for visual variety.
+ */
+enum class FoodType {
+    FISH, MILK, CHEESE
+}
+
+/**
+ * Data class representing a food item that can be collected by the player.
+ * Food items spawn from dustbins and arc upward before falling under gravity.
+ */
+data class FoodItem(
+    val id: String = UUID.randomUUID().toString(),
+    val x: Float,
+    val y: Float,
+    val width: Float = 60f,
+    val height: Float = 60f,
+    val velocityY: Float = -15f,  // Initial upward velocity
+    val isCollected: Boolean = false,
+    val sourceDustbinId: String,  // Tracks which bin spawned it
+    val foodType: FoodType = FoodType.FISH,
+    val spawnTimeMs: Long = System.currentTimeMillis()
+)

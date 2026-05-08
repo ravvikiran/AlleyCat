@@ -74,6 +74,29 @@ const val LOADING_SCREEN_DURATION_MS = 2500L
 const val DUST_BIN_SPAWN_X = 2500f  // where bins spawn off-screen
 const val VIEWPORT_WIDTH = 1080f    // approximate screen width in logical units
 
+// ==================== FOOD ITEMS ====================
+const val FOOD_WIDTH = 60f
+const val FOOD_HEIGHT = 60f
+const val FOOD_INITIAL_VELOCITY_Y = -15f  // upward launch velocity when spawned
+const val FOOD_POINTS = 5  // bonus score awarded on collection
+const val FOOD_SPAWN_DURATION_MIN_MS = 300L  // minimum upward animation duration
+const val FOOD_SPAWN_DURATION_MAX_MS = 500L  // maximum upward animation duration
+
+// Level-specific food spawn chances (probability of food on non-hazard bins)
+// These values are used in LevelData.foodSpawnChance:
+//   Level 1: 0.3 (30%)
+//   Level 2: 0.25 (25%)
+//   Level 3: 0.2 (20%)
+//   Level 4: 0.15 (15%)
+//   Mystery levels: 0.1 (10%)
+object LevelFoodSpawnChances {
+    val level1 = 0.3f
+    val level2 = 0.25f
+    val level3 = 0.2f
+    val level4 = 0.15f
+    val mystery = 0.1f
+}
+
 // ==================== LEVEL-SPECIFIC HAZARD PROBABILITIES ====================
 object LevelHazardChances {
     val level1 = 0.2f   // 20% base

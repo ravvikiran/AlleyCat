@@ -15,7 +15,8 @@ object LevelSystem {
                 baseHazardChance = 0.2f,
                 scoreToNext = 100,
                 lives = 3,
-                description = "Learn to jump and land on bins"
+                description = "Learn to jump and land on bins",
+                foodSpawnChance = LevelFoodSpawnChances.level1
             )
             2 -> LevelData(
                 level = 2,
@@ -25,7 +26,8 @@ object LevelSystem {
                 baseHazardChance = 0.35f,
                 scoreToNext = 200,
                 lives = 3,
-                description = "More dangers appear! Avoid those hazards!"
+                description = "More dangers appear! Avoid those hazards!",
+                foodSpawnChance = LevelFoodSpawnChances.level2
             )
             3 -> LevelData(
                 level = 3,
@@ -35,7 +37,8 @@ object LevelSystem {
                 baseHazardChance = 0.5f,
                 scoreToNext = 350,
                 lives = 3,
-                description = "Speed increases and hazards are everywhere!"
+                description = "Speed increases and hazards are everywhere!",
+                foodSpawnChance = LevelFoodSpawnChances.level3
             )
             4 -> LevelData(
                 level = 4,
@@ -43,19 +46,21 @@ object LevelSystem {
                 startingSpeed = 16f,
                 maxSpeed = 25f,
                 baseHazardChance = 0.65f,
-                scoreToNext = Int.MAX_VALUE,  // No level after this
+                scoreToNext = 350,
                 lives = 3,
-                description = "The ultimate test of your skills!"
+                description = "The ultimate test of your skills!",
+                foodSpawnChance = LevelFoodSpawnChances.level4
             )
             else -> LevelData(
                 level = level,
-                name = "MYSTERY ALLEY",
+                name = "MYSTERY ALLEY ${level - 4}",
                 startingSpeed = 18f + (level - 4) * 1f,
                 maxSpeed = 25f,
                 baseHazardChance = 0.7f,
-                scoreToNext = Int.MAX_VALUE,
+                scoreToNext = 500 + (level - 4) * 100,
                 lives = 3,
-                description = "Beyond the known alleys..."
+                description = "Beyond the known alleys...",
+                foodSpawnChance = LevelFoodSpawnChances.mystery
             )
         }
     }
@@ -73,5 +78,6 @@ data class LevelData(
     val baseHazardChance: Float,
     val scoreToNext: Int,
     val lives: Int,
-    val description: String
+    val description: String,
+    val foodSpawnChance: Float
 )

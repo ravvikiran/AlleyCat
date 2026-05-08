@@ -115,6 +115,23 @@ object SoundManager {
     }
 
     /**
+     * Plays food collection reward sound (short celebratory chime).
+     */
+    fun playFoodCollected() {
+        lock.readLock().lock()
+        try {
+            toneGenerator?.apply {
+                // Short reward chime for food collection
+                startTone(ToneGenerator.TONE_CDMA_PIP, 60)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing food collected sound", e)
+        } finally {
+            lock.readLock().unlock()
+        }
+    }
+
+    /**
      * Plays level completion sound (triumphant tone).
      */
     fun playLevelUp() {
