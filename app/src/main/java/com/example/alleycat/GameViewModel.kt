@@ -27,12 +27,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private companion object {
         private const val TAG = "GameViewModel"
         private const val HIGH_SCORE_KEY = "high_score"
+        private const val TUTORIAL_DONE_KEY = "tutorial_completed"
     }
 
     init {
         try {
             val savedHighScore = prefs.getInt(HIGH_SCORE_KEY, 0)
-            _gameState.update { it.copy(highScore = savedHighScore) }
+            val tutorialDone = prefs.getBoolean(TUTORIAL_DONE_KEY, false)
+            _gameState.update { it.copy(highScore = savedHighScore, tutorialCompleted = tutorialDone) }
             
             // Initial loading sequence
             viewModelScope.launch {
@@ -42,6 +44,54 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing ViewModel", e)
             _gameState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    /**
+     * Starts the interactive tutorial for first-time players.
+     */
+    fun startTutorial() {
+        try {
+            gameJob?.cancel()
+            lastLandedBinId = null
+            _gameState.update {
+                GameState(
+                    catY = GROUND_Y,
+                    catX = VIEWPORT_WIDTH / 2,
+                    isGameStarted = true,
+                    isLoading = false,
+                    isTutorial = true,
+                    tutorialStep = 1,
+                    tutorialCompleted = it.tutorialCompleted,
+                    dustbins = listOf(
+                        Dustbin(x = 400f),
+                        Dustbin(x = 800f),
+                        Dustbin(x = 1200f)
+                    ),
+                    highScore = it.highScore,
+                    gameSpeed = 5f,  // Slower for tutorial
+                    lives = 99,  // Can't die in tutorial
+                    currentLevel = 1
+                )
+            }
+            gameLoop()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting tutorial", e)
+        }
+    }
+
+    /**
+     * Advances the tutorial to the next step.
+     */
+    fun advanceTutorial() {
+        val currentStep = _gameState.value.tutorialStep
+        if (currentStep >= 4) {
+            // Tutorial complete
+            prefs.edit().putBoolean(TUTORIAL_DONE_KEY, true).apply()
+            _gameState.update { it.copy(isTutorial = false, tutorialCompleted = true, isGameStarted = false) }
+            gameJob?.cancel()
+        } else {
+            _gameState.update { it.copy(tutorialStep = currentStep + 1) }
         }
     }
 

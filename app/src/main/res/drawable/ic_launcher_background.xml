@@ -1,44 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Deep night sky gradient background -->
+    <!-- Sunset gradient background -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54" android:startY="0"
+                android:endX="54" android:endY="108"
+                android:type="linear">
+                <item android:color="#FFFF6B35" android:offset="0.0" />
+                <item android:color="#FFFF3864" android:offset="0.4" />
+                <item android:color="#FF6B2FA0" android:offset="0.7" />
+                <item android:color="#FF1A0533" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- City silhouette -->
     <path
-        android:fillColor="#0D0D2B"
-        android:pathData="M0,0h108v108h-108z" />
-    <!-- Subtle city skyline silhouette at bottom -->
-    <path
-        android:fillColor="#1A1A3E"
-        android:pathData="M0,85 L0,108 L108,108 L108,80 L100,80 L100,72 L95,72 L95,78 L88,78 L88,68 L82,68 L82,75 L75,75 L75,82 L68,82 L68,70 L62,70 L62,76 L55,76 L55,82 L48,82 L48,65 L42,65 L42,78 L35,78 L35,72 L28,72 L28,82 L20,82 L20,75 L15,75 L15,85 L8,85 L8,78 L0,78z" />
-    <!-- Moon glow -->
-    <path
-        android:fillColor="#1A1A4E"
-        android:pathData="M80,25 A12,12,0,1,1,80.01,25z" />
-    <!-- Stars -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M20,15 L20.5,16 L21,15 L20.5,14z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M35,22 L35.5,23 L36,22 L35.5,21z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M60,12 L60.5,13 L61,12 L60.5,11z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M90,18 L90.5,19 L91,18 L90.5,17z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M15,35 L15.5,36 L16,35 L15.5,34z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M50,30 L50.5,31 L51,30 L50.5,29z" />
-    <path
-        android:fillColor="#CCCCFF"
-        android:pathData="M72,8 L72.3,9 L73,8 L72.3,7z" />
-    <path
-        android:fillColor="#CCCCFF"
-        android:pathData="M25,42 L25.3,43 L26,42 L25.3,41z" />
+        android:fillColor="#1A0A2E"
+        android:pathData="M0,75 L0,108 L108,108 L108,70 L100,70 L100,60 L95,60 L95,68 L85,68 L85,55 L80,55 L80,65 L70,65 L70,50 L65,50 L65,62 L55,62 L55,48 L50,48 L50,60 L40,60 L40,52 L35,52 L35,65 L25,65 L25,58 L20,58 L20,70 L10,70 L10,62 L0,62z" />
 </vector>

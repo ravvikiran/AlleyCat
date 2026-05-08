@@ -1,35 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Colors -->
-    <color name="brand_primary">#FF00FFFF</color>
-    <color name="brand_secondary">#FFFF00FF</color>
-    <color name="brand_accent">#FF00FF88</color>
-
-    <!-- Night Theme -->
-    <color name="night_dark">#FF0A0A1A</color>
-    <color name="night_medium">#FF1A1A2E</color>
-    <color name="night_light">#FF2A2A4E</color>
-
-    <!-- Game Colors -->
-    <color name="cat_orange">#FFFF8C00</color>
-    <color name="neon_cyan">#FF00FFFF</color>
-    <color name="neon_magenta">#FFFF00FF</color>
-    <color name="neon_green">#FF00FF00</color>
-    <color name="danger_red">#FFFF3333</color>
-    <color name="gold">#FFFFD700</color>
-
-    <!-- UI Colors -->
-    <color name="surface_dark">#FF121212</color>
-    <color name="surface_card">#FF1A1A1A</color>
-    <color name="text_primary">#FFFFFFFF</color>
-    <color name="text_secondary">#FFCCCCCC</color>
-
-    <!-- Legacy (kept for compatibility) -->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="night_dark">#FF1A0533</color>
+    <color name="sunset_orange">#FFFF6B35</color>
+    <color name="graffiti_pink">#FFFF2D7B</color>
+    <color name="warm_gold">#FFFFB347</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

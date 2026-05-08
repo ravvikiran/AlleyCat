@@ -8,7 +8,7 @@ import java.util.UUID
  */
 data class GameState(
     val catY: Float = 0f,
-    val catX: Float = 200f,  // Starting X position (center-ish)
+    val catX: Float = 200f,
     val catState: CatState = CatState.IDLE,
     val velocityY: Float = 0f,
     val score: Int = 0,
@@ -26,7 +26,11 @@ data class GameState(
     val gameSpeed: Float = 10f,
     val distanceTraveled: Float = 0f,
     val movingLeft: Boolean = false,
-    val movingRight: Boolean = false
+    val movingRight: Boolean = false,
+    // Tutorial system
+    val isTutorial: Boolean = false,
+    val tutorialStep: Int = 0,  // 0=not started, 1=move, 2=jump, 3=land, 4=done
+    val tutorialCompleted: Boolean = false
 )
 
 /**
