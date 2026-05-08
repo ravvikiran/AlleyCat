@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.AlleyCat" parent="android:Theme.Material.Light.NoActionBar">
-        <!-- Status bar and navigation bar colors for immersive experience -->
-        <item name="android:statusBarColor">@color/night_dark</item>
-        <item name="android:navigationBarColor">@color/night_dark</item>
-        <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowBackground">@color/night_dark</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
         <!-- Android 12+ Splash Screen API -->
         <item name="android:windowSplashScreenBackground">@color/night_dark</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">@color/night_dark</item>
     </style>
 </resources>

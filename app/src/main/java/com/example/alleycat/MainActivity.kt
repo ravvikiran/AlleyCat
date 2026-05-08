@@ -3,7 +3,6 @@ package com.example.alleycat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -42,7 +41,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         SoundManager.init()
         HapticFeedback.init(this)
-        enableEdgeToEdge()
         setContent {
             AlleyCatTheme {
                 Surface(
@@ -192,8 +190,6 @@ fun GameScreen(viewModel: GameViewModel = viewModel()) {
 @Composable
 fun GameCanvas(state: GameState) {
     // Cache image resources to prevent reloading on every recomposition
-    // This fixes a memory leak where images were loaded repeatedly
-    val bgImage = ImageBitmap.imageResource(id = R.drawable.bg_alley_night)
     val catIdle = ImageBitmap.imageResource(id = R.drawable.cat_idle)
     val catJump = ImageBitmap.imageResource(id = R.drawable.cat_jump)
     val dustbinImg = ImageBitmap.imageResource(id = R.drawable.dustbin)
@@ -204,25 +200,46 @@ fun GameCanvas(state: GameState) {
         val logicalHeight = LOGICAL_HEIGHT
         val canvasScale = size.height / logicalHeight
         
-        // --- Parallax Background ---
-        val bgScale = size.height / bgImage.height.toFloat()
-        val bgWidth = (bgImage.width * bgScale).toInt()
-        val bgHeight = size.height.toInt()
-        val bgOffset = -((state.distanceTraveled * PARALLAX_SPEED_FACTOR * canvasScale).toInt() % bgWidth)
-
-        drawImage(
-            image = bgImage,
-            dstOffset = IntOffset(bgOffset, 0),
-            dstSize = IntSize(bgWidth, bgHeight)
+        // --- Parallax Background (drawn directly for performance) ---
+        // Sky gradient
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0xFF0A0A1A),
+                    Color(0xFF0D1B2A),
+                    Color(0xFF1B2838),
+                    Color(0xFF1A1A2E)
+                )
+            )
         )
-        drawImage(
-            image = bgImage,
-            dstOffset = IntOffset(bgOffset + bgWidth, 0),
-            dstSize = IntSize(bgWidth, bgHeight)
+        
+        // Scrolling city silhouette effect
+        val parallaxOffset = (state.distanceTraveled * PARALLAX_SPEED_FACTOR * canvasScale) % size.width
+        val buildingColor = Color(0xFF0F1520)
+        val buildingY = size.height * 0.35f
+        
+        // Simple building silhouettes that scroll
+        for (i in 0..12) {
+            val baseX = (i * size.width / 6f) - parallaxOffset
+            val adjustedX = if (baseX < -size.width / 6f) baseX + size.width * 2f else baseX
+            val bHeight = size.height * (0.15f + (i % 4) * 0.05f)
+            val bWidth = size.width / 14f
+            drawRect(
+                color = buildingColor,
+                topLeft = Offset(adjustedX, buildingY + (size.height * 0.3f - bHeight)),
+                size = Size(bWidth, bHeight + size.height * 0.5f)
+            )
+        }
+        
+        // Ground area
+        val groundLineY = GROUND_Y * canvasScale
+        drawRect(
+            color = Color(0xFF1A1A2E),
+            topLeft = Offset(0f, groundLineY),
+            size = Size(size.width, size.height - groundLineY)
         )
 
         // --- Ground Line ---
-        val groundLineY = GROUND_Y * canvasScale
         drawLine(
             color = Color.DarkGray.copy(alpha = GROUND_LINE_ALPHA),
             start = Offset(0f, groundLineY),
@@ -326,20 +343,13 @@ fun LoadingScreen() {
         label = "glow"
     )
     
-    // Cat eyes blinking
+    // Cat eyes blinking - simple pulse
     val eyeScale by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 0.1f,
         animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 3000
-                1f at 0
-                1f at 2600
-                0.1f at 2700
-                1f at 2800
-                1f at 3000
-            },
-            repeatMode = RepeatMode.Restart
+            animation = tween(200, delayMillis = 2800),
+            repeatMode = RepeatMode.Reverse
         ),
         label = "blink"
     )
@@ -762,7 +772,7 @@ fun SplashScreen(onStart: () -> Unit, onShowInstructions: () -> Unit) {
                 }
             }
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(40.dp))
             
             // Version info at bottom
             Text(
