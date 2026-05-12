@@ -18,6 +18,9 @@ data class GameState(
     val score: Int,
     val lives: Int,
     val currentLevel: Int,
+    val foodItems: List<FoodItem>,  // Active food items in the world
+    val tutorialMovedLeft: Boolean,  // Tutorial: player moved left
+    val tutorialMovedRight: Boolean, // Tutorial: player moved right
     // ... more properties
 )
 
@@ -28,14 +31,32 @@ data class Dustbin(
     val height: Float,
     val hasHazard: Boolean,
     val hazardType: HazardType,  // DOG, CRAZY_CAT, NONE
-    val hazardYOffset: Float  // 0f = hidden, 1f = fully visible
+    val hazardYOffset: Float,  // 0f = hidden, 1f = fully visible
+    val hasFood: Boolean,       // Whether this bin contains food
+    val foodCollected: Boolean,  // Whether food was already collected
+    val hazardWarned: Boolean,   // Whether hazard warning was triggered
+    val hazardEscapeFrames: Int  // Frame counter for escape window
+)
+
+enum class FoodType { FISH, MILK, CHEESE }
+
+data class FoodItem(
+    val id: String,
+    val x: Float,
+    val y: Float,
+    val velocityY: Float,  // Initial upward velocity (-15f)
+    val isCollected: Boolean,
+    val sourceDustbinId: String,
+    val foodType: FoodType
 )
 ```
 
 **Key Points**:
 - All state immutable (use `copy()` for updates)
-- UUIDs for unique bin identification
+- UUIDs for unique bin and food item identification
 - Y-offset for hazard animation
+- Mutual exclusion: `hasFood` and `hasHazard` are never both true on the same Dustbin
+- `hazardEscapeFrames` tracks the 10-frame escape window for rival cat mechanic
 
 ### 2. Business Logic Layer (`GameViewModel.kt`)
 
@@ -119,14 +140,23 @@ data class LevelData(
     val maxSpeed: Float,
     val baseHazardChance: Float,
     val scoreToNext: Int,
-    val lives: Int
+    val lives: Int,
+    val description: String,
+    val foodSpawnChance: Float  // Probability of food on non-hazard bins
 )
 ```
+
+**Level Progression**:
+- Levels 1-4: Defined with specific parameters
+- Level 4: scoreToNext = 350 (completable)
+- Mystery levels (5+): scoreToNext = 500 + (level-4)*100, named "MYSTERY ALLEY N"
+- Food spawn chance decreases: 30% → 25% → 20% → 15% → 10% (mystery)
 
 **Usage**:
 ```kotlin
 val levelData = LevelSystem.getLevelData(currentLevel)
 val hazardProbability = levelData.baseHazardChance + scoreMultiplier
+val shouldSpawnFood = Random.nextFloat() < levelData.foodSpawnChance
 ```
 
 ### 5. Audio Layer (`SoundManager.kt`)
@@ -141,11 +171,17 @@ object SoundManager {
     fun playHazardWarning()
     fun playLandingSound()
     fun playLevelUp()
+    fun playFoodCollected()  // Reward chime (60ms)
 }
 ```
 
 **Current Implementation**: ToneGenerator (built-in Android)
 **Future**: Can be extended to use MediaPlayer for MP3/WAV samples
+
+**Notes**:
+- `playLandingSound()` is called on every successful landing
+- `playFoodCollected()` plays a short reward chime when food is collected
+- `playHazardWarning()` plays once per hazard emergence (tracked via `hazardWarned` flag)
 
 ### 6. Presentation Layer (`MainActivity.kt`)
 
@@ -226,6 +262,107 @@ Box(
 ✅ Multiple simultaneous inputs  
 ✅ Natural mobile feel
 
+## Food Item System
+
+### Spawn Logic
+- When the cat lands on a non-hazard dustbin, food may spawn based on `LevelData.foodSpawnChance`
+- Mutual exclusion: dustbins with `hasHazard = true` never spawn food
+- Once food is collected from a bin, `foodCollected` is set to true (no re-spawn)
+
+### Physics
+- Food launches upward with `FOOD_INITIAL_VELOCITY_Y = -15f`
+- Gravity pulls it back down each frame
+- Food rendered as colored ovals: blue (FISH), white (MILK), yellow (CHEESE) with glow effects
+
+### Collision
+- Player collects food when cat hitbox overlaps food item hitbox
+- Collection awards `FOOD_POINTS = 5` bonus points
+- `SoundManager.playFoodCollected()` plays on collection
+
+### Food Type Selection
+- Random selection from `FoodType.FISH`, `FoodType.MILK`, `FoodType.CHEESE`
+
+---
+
+## Rival Cat Escape Mechanic
+
+### Warning System
+When a CRAZY_CAT hazard begins emerging (`hazardYOffset > 0`):
+1. **Visual**: Pulsing red exclamation mark rendered above the dustbin
+2. **Audio**: `SoundManager.playHazardWarning()` plays once (tracked by `hazardWarned` flag)
+3. **Haptic**: Proximity-based vibration when CRAZY_CAT is within 300 units of player
+
+### Escape Window
+- `hazardEscapeFrames` counter starts at 0 when hazard begins emerging
+- Increments each frame until reaching 10
+- During the 10-frame window, collision is NOT activated even if hitboxes overlap
+- After 10 frames, normal collision detection applies
+- Player can jump away during this window to avoid damage
+
+---
+
+## Tutorial System
+
+### Implementation
+- `isTutorial` flag in GameState prevents life loss (`loseLife` returns state unchanged)
+- `tutorialStep` tracks progress: 0=not started, 1=move, 2=jump, 3=land, 4=done
+
+### Step Progression
+- **Step 1**: Requires `tutorialMovedLeft = true` AND `tutorialMovedRight = true`
+  - `onTutorialMoveLeft()` and `onTutorialMoveRight()` track movement
+- **Step 2**: Player must jump
+- **Step 3**: Advances automatically when player lands on a dustbin
+
+### UI
+- Step progress indicator: "Step 1/3", "2/3", "3/3"
+- Skip button on all steps (calls `skipTutorial()`, exits without marking complete)
+
+---
+
+## Auto-Pause on App Background
+
+### Implementation
+- `MainActivity` implements lifecycle observer
+- `onStop()` triggers `viewModel.togglePause()`
+- `togglePause()` no longer requires `stateIsActionable()` - works regardless of current pause state
+- Ensures game doesn't continue running when app is backgrounded
+
+---
+
+## Testing
+
+### Kotest Property-Based Testing
+
+The project uses Kotest for property-based testing with the following dependencies:
+- `kotest-runner-junit5` - Test runner
+- `kotest-assertions-core` - Assertion library
+- `kotest-property` - Property-based testing
+- `mockk` - Mocking framework
+
+JUnit5 platform is configured in `build.gradle.kts`.
+
+### Custom Generators
+- `GameStateArb` - Generates arbitrary valid GameState instances
+- `DustbinArb` - Generates arbitrary Dustbin configurations
+- `FoodItemArb` - Generates arbitrary FoodItem instances
+
+### Correctness Properties
+29 properties are defined covering:
+- Physics invariants (gravity, jump mechanics)
+- Collision detection correctness
+- Food spawn mutual exclusion
+- Level progression logic
+- Tutorial state transitions
+- Score calculation accuracy
+- Escape window frame counting
+
+### Running Tests
+```bash
+./gradlew test
+```
+
+---
+
 ## Extending the Game
 
 ### Adding a New Level
@@ -275,6 +412,27 @@ val hazardImg = when (bin.hazardType) {
     else -> hazardDogImg
 }
 ```
+
+### Adding a New Food Type
+
+1. Update `GameModels.kt`:
+```kotlin
+enum class FoodType {
+    FISH, MILK, CHEESE, BONE  // Add BONE
+}
+```
+
+2. Update rendering in `MainActivity.kt` to add color/glow for the new type:
+```kotlin
+val foodColor = when (food.foodType) {
+    FoodType.FISH -> Color.Blue
+    FoodType.MILK -> Color.White
+    FoodType.CHEESE -> Color.Yellow
+    FoodType.BONE -> Color.Gray  // New
+}
+```
+
+3. Optionally adjust `FOOD_POINTS` or add type-specific scoring in `GameViewModel.kt`
 
 ### Adding Power-ups
 

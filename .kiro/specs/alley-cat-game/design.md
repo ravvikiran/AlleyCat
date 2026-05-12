@@ -4,7 +4,7 @@
 
 This design document describes the technical architecture for the Alley Cat Android game — a side-scrolling platformer where the player controls a cat jumping between dustbins in an alley environment. The game is built with Kotlin and Jetpack Compose, using an MVVM architecture with a coroutine-based game loop running at ~60 FPS.
 
-The existing codebase provides a solid foundation with core movement, jumping, landing, hazard avoidance, level progression, sound, and haptic feedback already implemented. This design extends the system to incorporate food item collection, rival cat escape mechanics, and ensures all 16 requirements are fully addressed with a cohesive architecture.
+The codebase now fully implements all 16 requirements including core movement, jumping, landing, hazard avoidance, level progression, sound, haptic feedback, food item collection, rival cat escape mechanics, tutorial system, and auto-pause on app background.
 
 ### Key Design Decisions
 
@@ -61,10 +61,10 @@ graph TD
 
 | Component | Responsibility |
 |-----------|---------------|
-| `MainActivity` | Activity lifecycle, initializes SoundManager/HapticFeedback, hosts Compose UI |
-| `GameScreen` | Orchestrates overlays, control zones, and canvas based on game state |
-| `GameCanvas` | Renders all game objects using Canvas draw calls with logical-to-screen scaling |
-| `GameViewModel` | Owns game state, runs game loop, processes physics and collisions |
+| `MainActivity` | Activity lifecycle, initializes SoundManager/HapticFeedback, auto-pauses on background, hosts Compose UI |
+| `GameScreen` | Orchestrates overlays, control zones, tutorial callbacks, and canvas based on game state |
+| `GameCanvas` | Renders all game objects (background, dustbins, hazard warnings, food items, cat) using Canvas draw calls with logical-to-screen scaling |
+| `GameViewModel` | Owns game state, runs game loop, processes physics, collisions, food spawning/collection, hazard escape mechanics |
 | `GameModels` | Defines immutable data classes for all game entities |
 | `GameConstants` | Central repository of tuning values (physics, spawning, scoring) |
 | `LevelSystem` | Provides level-specific configuration (speed, hazard chance, score thresholds) |
@@ -73,21 +73,24 @@ graph TD
 
 ## Components and Interfaces
 
-### GameViewModel (Extended)
+### GameViewModel
 
 ```kotlin
 class GameViewModel(application: Application) : AndroidViewModel(application) {
-    // Existing public API
+    // Public API
     fun startGame()
     fun startNextLevel()
     fun startTutorial()
     fun advanceTutorial()
+    fun onTutorialMoveLeft()   // Tracks left movement for tutorial step 1
+    fun onTutorialMoveRight()  // Tracks right movement for tutorial step 1
+    fun skipTutorial()         // Exits tutorial without marking complete
     fun jump()
     fun moveLeft()
     fun stopMoveLeft()
     fun moveRight()
     fun stopMoveRight()
-    fun togglePause()
+    fun togglePause()          // Works when game started & not game over (regardless of pause state)
     fun resume()
     fun resetToHome()
     fun showInstructions()
@@ -96,16 +99,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     // Internal game loop
     private fun gameLoop()
-    private fun update()  // Main tick: physics, collisions, spawning
-    private fun loseLife(state: GameState): GameState
-    private fun generateInitialDustbins(): List<Dustbin>
+    private fun update()  // Main tick: physics, collisions, spawning, food, hazard warnings
+    private fun loseLife(state: GameState): GameState  // Returns state unchanged if isTutorial
+    private fun generateInitialDustbins(): List<Dustbin>  // Assigns food/hazard with mutual exclusion
     private fun stateIsActionable(): Boolean
     private fun saveHighScore(score: Int)
-
-    // New: Food item logic
-    private fun spawnFoodItem(state: GameState, dustbin: Dustbin): GameState
-    private fun updateFoodItems(state: GameState): GameState
-    private fun checkFoodCollision(state: GameState): GameState
 }
 ```
 
@@ -153,7 +151,7 @@ data class SpawnConfig(
 )
 ```
 
-### LevelSystem (Extended)
+### LevelSystem
 
 ```kotlin
 data class LevelData(
@@ -162,10 +160,10 @@ data class LevelData(
     val startingSpeed: Float,
     val maxSpeed: Float,
     val baseHazardChance: Float,
-    val scoreToNext: Int,
+    val scoreToNext: Int,        // Level 4 = 350, Mystery = 500 + (level-4)*100
     val lives: Int,
     val description: String,
-    val foodSpawnChance: Float  // New: probability of food on non-hazard bins
+    val foodSpawnChance: Float   // Probability of food on non-hazard bins (L1:0.3, L2:0.25, L3:0.2, L4:0.15, Mystery:0.1)
 )
 ```
 
@@ -180,9 +178,9 @@ object SoundManager {
     fun playDeathSound()       // Descending tone, 150ms
     fun playScoreBonus()       // Celebratory pip, 80ms
     fun playLevelUp()          // Triumphant confirm, 300ms
-    fun playLandingSound()     // Soft confirm, 100ms
+    fun playLandingSound()     // Soft confirm, 100ms (plays on every landing)
     fun playHazardWarning()    // Warning tone, 200ms
-    fun playFoodCollected()    // New: reward chime
+    fun playFoodCollected()    // Reward chime, 60ms
 }
 ```
 
@@ -203,7 +201,7 @@ object HapticFeedback {
 
 ## Data Models
 
-### GameState (Extended)
+### GameState
 
 ```kotlin
 data class GameState(
@@ -232,7 +230,7 @@ data class GameState(
 
     // World objects
     val dustbins: List<Dustbin> = emptyList(),
-    val foodItems: List<FoodItem> = emptyList(),  // New
+    val foodItems: List<FoodItem> = emptyList(),
 
     // Movement
     val gameSpeed: Float = 10f,
@@ -242,12 +240,14 @@ data class GameState(
 
     // Tutorial
     val isTutorial: Boolean = false,
-    val tutorialStep: Int = 0,
-    val tutorialCompleted: Boolean = false
+    val tutorialStep: Int = 0,       // 0=not started, 1=move, 2=jump, 3=land, 4=done
+    val tutorialCompleted: Boolean = false,
+    val tutorialMovedLeft: Boolean = false,   // Tracks left movement for step 1
+    val tutorialMovedRight: Boolean = false   // Tracks right movement for step 1
 )
 ```
 
-### FoodItem (New)
+### FoodItem
 
 ```kotlin
 data class FoodItem(
@@ -259,11 +259,12 @@ data class FoodItem(
     val velocityY: Float = -15f,  // Initial upward velocity
     val isCollected: Boolean = false,
     val sourceDustbinId: String,  // Tracks which bin spawned it
+    val foodType: FoodType = FoodType.FISH,
     val spawnTimeMs: Long = System.currentTimeMillis()
 )
 ```
 
-### Dustbin (Extended)
+### Dustbin
 
 ```kotlin
 data class Dustbin(
@@ -273,9 +274,11 @@ data class Dustbin(
     val height: Float = 250f,
     val hasHazard: Boolean = false,
     val hazardType: HazardType = HazardType.NONE,
-    val hazardYOffset: Float = 0f,
-    val hasFood: Boolean = false,       // New: whether this bin contains food
-    val foodCollected: Boolean = false   // New: whether food was already collected
+    val hazardYOffset: Float = 0f,       // 0f = hidden, 1f = fully visible
+    val hasFood: Boolean = false,        // Whether this bin contains food
+    val foodCollected: Boolean = false,   // Whether food was already collected
+    val hazardWarned: Boolean = false,    // Whether hazard warning was triggered
+    val hazardEscapeFrames: Int = 0       // Frame counter for escape window
 )
 ```
 
@@ -284,7 +287,7 @@ data class Dustbin(
 ```kotlin
 enum class CatState { IDLE, JUMPING, FALLING, DEAD }
 enum class HazardType { NONE, DOG, CRAZY_CAT }
-enum class FoodType { FISH, MILK, CHEESE }  // New: visual variety
+enum class FoodType { FISH, MILK, CHEESE }
 ```
 
 ### State Transition Diagram

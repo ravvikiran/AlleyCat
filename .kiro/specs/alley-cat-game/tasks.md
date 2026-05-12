@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan implements the remaining features and fills gaps in the Alley Cat Android game. The existing codebase has core movement, jumping, landing, hazard avoidance, level progression, sound, and haptic feedback. The main new work includes: food item collection system, rival cat escape mechanics, tutorial system refinements, Kotest property-based testing infrastructure, and alignment of existing code with all 16 requirements.
+All core implementation tasks are complete. The Alley Cat game now fully implements all 16 requirements including: food item collection system, rival cat escape mechanics, tutorial system with action-based advancement and skip functionality, auto-pause on app background, landing sound on all landings, Level 4 completion with mystery level unlock, and Kotest property-based testing infrastructure with custom generators. The remaining tasks are optional property-based tests (marked with `*`) and checkpoints.
 
 ## Tasks
 
@@ -282,13 +282,26 @@ This plan implements the remaining features and fills gaps in the Alley Cat Andr
 
 ## Notes
 
-- Tasks marked with `*` are optional and can be skipped for faster MVP
+- Tasks marked with `*` are optional property-based tests and can be skipped for faster MVP
+- All core implementation tasks (1-3, 5-6, 8, 14-15) are COMPLETE ✅
+- Testing infrastructure (Kotest + generators) is ready — optional property tests can be written at any time
 - Each task references specific requirements for traceability
-- Checkpoints ensure incremental validation
-- Property tests validate universal correctness properties from the design document
-- Unit tests validate specific examples and edge cases
-- The existing codebase already handles Requirements 1, 2, 3 (partially), 5 (partially), 7, 8, 9 (partially), 10, 12 (partially), 13, 14, 15, and 16 (partially)
-- Main new implementation work: food items (Req 4), rival cat escape (Req 6), tutorial refinement (Req 11), and gap fixes
+- Checkpoints (4, 7, 16) are for manual verification
+- The codebase now fully implements all 16 requirements:
+  - Req 1-3: Movement, jumping, landing (with landing sound fix)
+  - Req 4: Food item collection (spawn, physics, collision, scoring)
+  - Req 5: Hazard system (emergence, collision, types, mutual exclusion)
+  - Req 6: Rival cat escape (warning indicator, escape window, proximity haptic)
+  - Req 7: Scrolling world and dustbin spawning
+  - Req 8: Lives and game over
+  - Req 9: Level progression (Level 4 completion, mystery levels)
+  - Req 10: Streak and scoring bonuses
+  - Req 11: Tutorial system (3-step action-based, skip, persistence)
+  - Req 12: Pause and resume (auto-pause on background)
+  - Req 13: Visual presentation (parallax, food items, warning indicators)
+  - Req 14: Audio feedback (all sounds including food collection)
+  - Req 15: Haptic feedback (all patterns including hazard warning)
+  - Req 16: High score persistence (with edge case handling)
 
 ## Task Dependency Graph
 
